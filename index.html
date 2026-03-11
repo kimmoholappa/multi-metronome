@@ -84,11 +84,14 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .dot-area:active .dot { transform: scale(0.85); }
 
 .mc-inner { display: flex; flex-direction: column; gap: 8px; padding: 9px 0; width: 100%; }
-.bpm-group { flex: 1; display: flex; align-items: center; gap: 4px; container-type: inline-size; min-width: 0; overflow: hidden; }
-.bpm-val { font-size: 40px; font-weight: 700; line-height: 1; cursor: text; font-family: 'Archivo Black', sans-serif; white-space: nowrap; display: inline-block; transform-origin: left center; transition: transform .15s; }
+.bpm-group { flex: 1; display: flex; align-items: center; gap: 4px; container-type: inline-size; min-width: 0; }
+.bpm-val { font-size: 40px; font-weight: 700; line-height: 1; cursor: text; font-family: 'Archivo Black', sans-serif; white-space: nowrap; display: inline-block; transform-origin: left center; transition: transform .15s; margin-right: 0; }
 .bpm-val[contenteditable]:focus { outline: none; color: var(--accent); }
 @container (max-width: 100px) {
   .bpm-val { transform: scaleX(0.72); margin-right: -28%; }
+}
+@container (min-width: 101px) {
+  .bpm-val { transform: none; margin-right: 0; }
 }
 .bpm-unit { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; align-self: flex-end; margin-bottom: 4px; font-family: 'Space Mono', monospace; }
 .bpm-btns { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
