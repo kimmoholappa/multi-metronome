@@ -25,7 +25,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 body { display: flex; flex-direction: column; overflow: hidden; }
 
 /* ── TOP BAR ── */
-.topbar { display: flex; align-items: center; padding: 10px 14px; background: var(--accent2); border-bottom: 3px solid var(--border); flex-shrink: 0; }
+.topbar { display: flex; align-items: center; justify-content: center; padding: 10px 14px; background: var(--accent2); border-bottom: 3px solid var(--border); flex-shrink: 0; }
 .topbar h1 { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text); font-family: 'Archivo Black', sans-serif; line-height: 1.2; }
 
 .btn-add { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 0; border: 2px solid var(--border); background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; box-shadow: var(--shadow); font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 1px; transition: transform .1s, box-shadow .1s; }
@@ -127,9 +127,8 @@ select.mc-sel { background: var(--surface); border: 2px solid var(--border); col
 }
 
 /* ── FOOTER TOOLBAR ── */
-.toolbar { flex-shrink: 0; display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--accent2); border-top: 3px solid var(--border); }
-.toolbar-attr { flex: 1; text-align: right; font-size: 9px; color: var(--text); font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 1px; opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.toolbar-attr a { color: inherit; text-decoration: underline; }
+.toolbar { flex-shrink: 0; display: flex; align-items: stretch; justify-content: center; gap: 6px; padding: 8px 12px; background: var(--accent2); border-top: 3px solid var(--border); }
+
 
 /* ── MODALS ── */
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 100; align-items: center; justify-content: center; padding: 16px; }
@@ -222,7 +221,6 @@ select.mc-sel { background: var(--surface); border: 2px solid var(--border); col
   <button class="btn-settings" onclick="openSettings()" title="Settings">⚙️</button>
   <button class="btn-search" onclick="openSearch()">🔍 Search</button>
   <button class="btn-add" onclick="addMetro()">＋ New</button>
-  <span class="toolbar-attr">BPM data: <a href="https://www.last.fm" target="_blank" rel="noopener">Last.fm</a></span>
 </div>
 
 <!-- Settings Modal -->
@@ -259,7 +257,7 @@ select.mc-sel { background: var(--surface); border: 2px solid var(--border); col
         </div>
         <div class="setting-control">
           <div class="click-type-btns">
-            <button class="ctype" id="ctype-wood"   onclick="setClickType('wood')"  >Wood</button>
+            <button class="ctype" id="ctype-wood"   onclick="setClickType('wood')"  >Classic</button>
             <button class="ctype" id="ctype-beep"   onclick="setClickType('beep')"  >Beep</button>
             <button class="ctype" id="ctype-soft"   onclick="setClickType('soft')"  >Soft</button>
           </div>
@@ -310,7 +308,7 @@ select.mc-sel { background: var(--surface); border: 2px solid var(--border); col
 const GETSONGBPM_API_KEY = 'YOUR_API_KEY_HERE'; // ← replace when ready
 
 // ── BUNDLED BPM DATABASE (~120 well-known songs) ──
-// Used as primary source; Last.fm search used to find matches by name
+// Primary source: bundled community BPM database
 const BPM_DB = [
   // Pop / Top 40
   {t:"Blinding Lights",a:"The Weeknd",bpm:171},
@@ -902,7 +900,7 @@ async function doSearch() {
     } catch (e) { /* fail silently */ }
   }
 
-  // 3. Last.fm cross-reference (no key needed) for additional DB matches
+  // 3. Last.fm track search — finds alternate title spellings to match against local DB (no BPM from Last.fm)
   try {
     const lfmUrl = `https://ws.audioscrobbler.com/2.0/?method=track.search&track=${encodeURIComponent(query)}&api_key=7d07b45e78bbdec80a80d606e94e1cd1&format=json&limit=15`;
     const res = await fetch(lfmUrl);
@@ -1042,16 +1040,32 @@ function playClick(isB1, isQ) {
     const role = (accent && isB1) ? 'b1' : isQ ? 'beat' : 'sub';
 
     if (type === 'wood') {
-      const freqs =  { b1: [1200, 600], beat: [900, 450], sub: [1400, 900] };
-      const durs =   { b1: 0.08,        beat: 0.065,      sub: 0.03 };
-      const vols =   { b1: 0.55,        beat: 0.35,       sub: 0.12 };
-      const [f1, f2] = freqs[role];
-      const dur = durs[role], v = vols[role] * vol;
-      osc.frequency.setValueAtTime(f1, now);
-      osc.frequency.exponentialRampToValueAtTime(f2, now + dur * 0.5);
+      // Ableton "Classic" style: sine, instant attack, sharp exponential decay ~40ms
+      // Downbeat ~1500Hz, beat ~800Hz, sub ~600Hz — with a brief noise transient for edge
+      const freqs = { b1: 1500, beat: 800, sub: 600 };
+      const durs  = { b1: 0.04, beat: 0.035, sub: 0.025 };
+      const vols  = { b1: 0.65, beat: 0.45,  sub: 0.18 };
+      const freq = freqs[role], dur = durs[role], v = vols[role] * vol;
+
+      // Main sine click
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
       gain.gain.setValueAtTime(v, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
       osc.start(now); osc.stop(now + dur);
+
+      // Noise transient for click edge (very short burst)
+      const bufSize = ctx.sampleRate * 0.003;
+      const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1);
+      const noise = ctx.createBufferSource();
+      noise.buffer = buf;
+      const noiseGain = ctx.createGain();
+      noise.connect(noiseGain); noiseGain.connect(ctx.destination);
+      noiseGain.gain.setValueAtTime(v * 0.4, now);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.003);
+      noise.start(now); noise.stop(now + 0.003);
 
     } else if (type === 'beep') {
       const freqs = { b1: 1000, beat: 700, sub: 500 };
