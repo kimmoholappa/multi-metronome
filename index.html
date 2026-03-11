@@ -84,16 +84,10 @@ body { display: flex; flex-direction: column; overflow: hidden; }
 .dot-area:active .dot { transform: scale(0.85); }
 
 .mc-inner { display: flex; flex-direction: column; gap: 8px; padding: 9px 0; width: 100%; }
-.bpm-group { flex: 1; display: flex; align-items: center; gap: 4px; container-type: inline-size; min-width: 0; }
-.bpm-val { font-size: 40px; font-weight: 700; line-height: 1; cursor: text; font-family: 'Archivo Black', sans-serif; white-space: nowrap; display: inline-block; transform-origin: left center; transition: transform .15s; margin-right: 0; }
+.bpm-group { flex: 1; display: flex; align-items: center; gap: 4px; min-width: 0; overflow: hidden; }
+.bpm-val { font-size: clamp(26px, 8vw, 40px); font-weight: 700; line-height: 1; cursor: text; font-family: 'Archivo Black', sans-serif; white-space: nowrap; min-width: 0; flex-shrink: 1; }
 .bpm-val[contenteditable]:focus { outline: none; color: var(--accent); }
-@container (max-width: 100px) {
-  .bpm-val { transform: scaleX(0.72); margin-right: -28%; }
-}
-@container (min-width: 101px) {
-  .bpm-val { transform: none; margin-right: 0; }
-}
-.bpm-unit { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; align-self: flex-end; margin-bottom: 4px; font-family: 'Space Mono', monospace; }
+.bpm-unit { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; align-self: flex-end; margin-bottom: 4px; font-family: 'Space Mono', monospace; flex-shrink: 0; }
 .bpm-btns { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
 .bpm-btn { width: 26px; height: 20px; border-radius: 0; border: 2px solid var(--border); background: var(--surface); color: var(--text); font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 2px 2px 0 #000; transition: transform .1s, box-shadow .1s; }
 .bpm-btn:active { transform: translate(2px,2px); box-shadow: none; }
@@ -1268,11 +1262,11 @@ function searchLocal(query) {
 }
 
 // ── CORE DATA ──
-let metros = JSON.parse(localStorage.getItem('vmet2') || 'null') || [
-  { id: 1, name: 'Intro',  bpm: 80,  ts: 4, subdiv: 2, sound: false },
-  { id: 2, name: 'Verse',  bpm: 120, ts: 4, subdiv: 2, sound: false },
-  { id: 3, name: 'Chorus', bpm: 128, ts: 4, subdiv: 2, sound: false },
-];
+function randomSongMetro() {
+  const song = BPM_DB[Math.floor(Math.random() * BPM_DB.length)];
+  return [{ id: 1, name: song.t, bpm: song.bpm, ts: 4, subdiv: 2, sound: false }];
+}
+let metros = JSON.parse(localStorage.getItem('vmet2') || 'null') || randomSongMetro();
 let nid = Math.max(0, ...metros.map(m => m.id)) + 1;
 const rt = {};
 function rtOf(id) {
