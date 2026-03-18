@@ -367,7 +367,7 @@ select.mc-sel { background: var(--surface); border: 2px solid var(--border); col
     </div>
     <div class="search-hint" id="searchHint"></div>
     <div class="search-results" id="searchResults">
-      <div class="search-status">Search for a song to find its BPM</div>
+      <div class="search-status">Search for a song to find a BPM (A lot of the data is unreliable and a fix is being worked on)</div>
     </div>
     <div style="padding:8px 12px 12px;border-top:2px solid var(--border);flex-shrink:0">
       <button onclick="addMetro();closeSearch();" style="width:100%;padding:11px;border:2px solid var(--border);background:var(--surface);color:var(--text);font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;cursor:pointer;box-shadow:var(--shadow);transition:background .15s,color .15s" onmouseover="this.style.background='var(--accent)';this.style.color='#fff'" onmouseout="this.style.background='var(--surface)';this.style.color='var(--text)'">＋ Or add blank tempo</button>
@@ -405,9 +405,6 @@ const BPM_DB = [
   {t:"Love Story",a:"Taylor Swift",bpm:119},
   {t:"Blank Space",a:"Taylor Swift",bpm:96},
   {t:"Cruel Summer",a:"Taylor Swift",bpm:170},
-  {t:"Teenage Dream",a:"Katy Perry",bpm:120},
-  {t:"Roar",a:"Katy Perry",bpm:90},
-  {t:"Firework",a:"Katy Perry",bpm:124},
   {t:"Call Me Maybe",a:"Carly Rae Jepsen",bpm:120},
   {t:"Somebody That I Used to Know",a:"Gotye ft. Kimbra",bpm:129},
   {t:"Mirrors",a:"Justin Timberlake",bpm:120},
@@ -421,9 +418,9 @@ const BPM_DB = [
   {t:"Bohemian Rhapsody",a:"Queen",bpm:144},
   {t:"We Will Rock You",a:"Queen",bpm:81},
   {t:"Don't Stop Me Now",a:"Queen",bpm:156},
-  {t:"Under Pressure",a:"Queen & David Bowie",bpm:110},
+  {t:"Under Pressure",a:"Queen & David Bowie",bpm:128},
   {t:"Hotel California",a:"Eagles",bpm:147},
-  {t:"Wonderwall",a:"Oasis",bpm:87},
+  {t:"Wonderwall",a:"Oasis",bpm:174},
   {t:"Smells Like Teen Spirit",a:"Nirvana",bpm:117},
   {t:"Come As You Are",a:"Nirvana",bpm:120},
   {t:"Mr. Brightside",a:"The Killers",bpm:148},
@@ -517,11 +514,11 @@ const BPM_DB = [
   {t:"Fly Me to the Moon",a:"Frank Sinatra",bpm:144},
   // Kiss
   {t:"Sure Know Something",a:"Kiss",bpm:115},
-  {t:"Rock and Roll All Nite",a:"Kiss",bpm:152},
-  {t:"Detroit Rock City",a:"Kiss",bpm:152},
+  {t:"Rock and Roll All Nite",a:"Kiss",bpm:145},
+  {t:"Detroit Rock City",a:"Kiss",bpm:180},
   {t:"I Was Made for Lovin' You",a:"Kiss",bpm:128},
-  {t:"Beth",a:"Kiss",bpm:74},
-  {t:"Shout It Out Loud",a:"Kiss",bpm:148},
+  {t:"Beth",a:"Kiss",bpm:115},
+  {t:"Shout It Out Loud",a:"Kiss",bpm:134},
   {t:"Love Gun",a:"Kiss",bpm:141},
   {t:"Calling Dr. Love",a:"Kiss",bpm:136},
   {t:"Strutter",a:"Kiss",bpm:138},
@@ -559,7 +556,7 @@ const BPM_DB = [
   {t:"Satisfaction",a:"The Rolling Stones",bpm:136},
   {t:"Brown Sugar",a:"The Rolling Stones",bpm:152},
   {t:"Layla",a:"Derek and the Dominos",bpm:116},
-  {t:"Cocaine",a:"Eric Clapton",bpm:102},
+  {t:"Cocaine",a:"Eric Clapton",bpm:105},
   {t:"Sultans of Swing",a:"Dire Straits",bpm:148},
   {t:"Money for Nothing",a:"Dire Straits",bpm:134},
   {t:"Higher Ground",a:"Stevie Wonder",bpm:138},
@@ -1731,12 +1728,9 @@ const BPM_DB = [
   {t:"Heart of Gold",a:"Neil Young",bpm:100},
   {t:"Old Man",a:"Neil Young",bpm:132},
   {t:"Rockin' in the Free World",a:"Neil Young",bpm:136},
-  {t:"Harvest Moon",a:"Neil Young",bpm:96},
   // Simon & Garfunkel
-  {t:"The Sound of Silence",a:"Simon & Garfunkel",bpm:104},
+  {t:"The Sound of Silence",a:"Simon & Garfunkel",bpm:108},
   {t:"Mrs. Robinson",a:"Simon & Garfunkel",bpm:176},
-  {t:"Bridge Over Troubled Water",a:"Simon & Garfunkel",bpm:74},
-  {t:"The Boxer",a:"Simon & Garfunkel",bpm:100},
   // Otis Redding
   {t:"Sittin' On the Dock of the Bay",a:"Otis Redding",bpm:100},
   {t:"Try a Little Tenderness",a:"Otis Redding",bpm:58},
@@ -1753,22 +1747,8 @@ const BPM_DB = [
   {t:"Hurt",a:"Johnny Cash",bpm:60},
   {t:"Man in Black",a:"Johnny Cash",bpm:90},
   {t:"Walk the Line",a:"Johnny Cash",bpm:140},
-  // Bob Seger
-  {t:"Old Time Rock and Roll",a:"Bob Seger",bpm:122},
-  {t:"Night Moves",a:"Bob Seger",bpm:110},
-  {t:"Turn the Page",a:"Bob Seger",bpm:68},
-  // The Supremes / Diana Ross
-  {t:"Stop! In the Name of Love",a:"The Supremes",bpm:122},
-  {t:"You Can't Hurry Love",a:"The Supremes",bpm:132},
-  {t:"Baby Love",a:"The Supremes",bpm:130},
-  {t:"I'm Coming Out",a:"Diana Ross",bpm:120},
-  // The Pretenders
-  {t:"Brass in Pocket",a:"The Pretenders",bpm:104},
-  {t:"Back on the Chain Gang",a:"The Pretenders",bpm:132},
-  {t:"I'll Stand by You",a:"The Pretenders",bpm:68},
   // Janis Joplin
-  {t:"Me and Bobby McGee",a:"Janis Joplin",bpm:150},
-  {t:"Piece of My Heart",a:"Janis Joplin",bpm:148},
+  {t:"Piece of My Heart",a:"Janis Joplin",bpm:80},
 ];
 
 // Normalize string for fuzzy matching
